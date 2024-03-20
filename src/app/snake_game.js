@@ -71,13 +71,45 @@ const keyboard_setup = (ctx) => {
         }
     })
 }
-const launch_game = (ctx) => {
-    if(!state.interval) start_level(ctx);
-}
 
 const game_events_setup = (ctx) => {
     window.addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
     window.addEventListener(NEXT_LEVEL_REACHED_EVENT, on_next_level(ctx));
+}
+
+const launch_game = (ctx) => {
+    if(!state.interval) start_level(ctx);
+}
+
+const start_level = (ctx) => {
+    state.interval = setInterval(refresh_canvas(ctx), state.speed);
+}
+
+const refresh_canvas = (ctx) => () => {
+    ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
+    if(is_not_died_snake(state.snake_state)){
+        step_forward();
+        draw_game_sprites(state, ctx);
+    }else loose_game(ctx);
+}
+
+const loose_game = (ctx) => {
+    clearInterval(state.interval);
+    draw_game_sprites(state, ctx);
+}
+
+const step_forward = () => {
+    state.snake_state = move_snake(state.snake_state);
+    state.snake_state = check_border_collision(state.snake_state);
+    state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
+    if_apple_eaten();
+}
+
+const is_not_died_snake = (snake_state) => !snake_state.died;
+
+const if_apple_eaten = () => {
+    if(state.apple_state.eaten_event)
+        dispatchEvent(state.apple_state.eaten_event);
 }
 
 const on_apple_eaten = () => {
@@ -99,38 +131,6 @@ const on_next_level = ctx => () => {
     clearInterval(state.interval);
     start_level(ctx);
 }
-
-const start_level = (ctx) => {
-    state.interval = setInterval(refresh_canvas(ctx), state.speed);
-}
-
-
-const refresh_canvas = (ctx) => () => {
-    ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
-    if(is_not_died_snake(state.snake_state)){
-        draw_game_sprites(state, ctx);
-        step_forward();
-    }else loose_game(ctx);
-}
-
-const loose_game = (ctx) => {
-    clearInterval(state.interval);
-    draw_snake(state.snake_state.body, ctx);
-    draw_score(state.score, ctx);
-}
-
-const if_apple_eaten = () => {
-    if(state.apple_state.eaten_event)
-        dispatchEvent(state.apple_state.eaten_event);
-}
-const step_forward = () => {
-    state.snake_state = move_snake(state.snake_state);
-    state.snake_state = check_border_collision(state.snake_state);
-    state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
-    if_apple_eaten();
-}
-
-const is_not_died_snake = (snake_state) => !snake_state.died;
 
 export const init = () => {
     const ctx = canvas_setup();

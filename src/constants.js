@@ -1,3 +1,5 @@
+import {image_builder} from "./core/common.js";
+
 export const RIGHT = "RIGHT";
 export const UP = "UP";
 export const DOWN = "DOWN";
@@ -37,3 +39,7 @@ export const BORDER_UP_BLOCK = BORDER_UP/BLOCK_SIZE+1
 
 export const APPLE_EATEN_EVENT = "apple_eaten";
 export const NEXT_LEVEL_REACHED_EVENT = "next_level_reached";
+export const APPLE_IMG = "../sprites/apple.png"
+export const SNAKE_HEAD_IMG = "../sprites/snake_head_"
+export const SNAKE_COLOR = "#6a9e68";
+
