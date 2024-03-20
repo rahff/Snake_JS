@@ -17,7 +17,7 @@ export const check_border_collision = (snake_state) => {
 
 const killIfOnTheBorder = (snake_head) => {
     return snake_head.x >= (BORDER_RIGHT_BLOCK - 1) ||
-           snake_head.x <= BORDER_LEFT ||
+           snake_head.x < BORDER_LEFT ||
            snake_head.y >= (BORDER_UP_BLOCK - 1) ||
-           snake_head.y <= BORDER_DOWN;
+           snake_head.y < BORDER_DOWN;
 }

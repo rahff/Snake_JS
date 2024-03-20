@@ -5,6 +5,7 @@ var DOWN = "DOWN";
 var LEFT = "LEFT";
 var opposite_directions = {
   [UP]: DOWN,
+  [DOWN]: UP,
   [LEFT]: RIGHT,
   [RIGHT]: LEFT
 };
@@ -24,8 +25,8 @@ var ARROW_UP_KEY = "ArrowUp";
 var ARROW_DOWN_KEY = "ArrowDown";
 var ENTER_KEY = "Enter";
 var BLOCK_SIZE = 30;
-var BORDER_RIGHT_BLOCK = BORDER_RIGHT / BLOCK_SIZE;
-var BORDER_UP_BLOCK = BORDER_UP / BLOCK_SIZE;
+var BORDER_RIGHT_BLOCK = BORDER_RIGHT / BLOCK_SIZE + 1;
+var BORDER_UP_BLOCK = BORDER_UP / BLOCK_SIZE + 1;
 
 // src/core/common.js
 var position_equal = (position, other) => {
@@ -76,11 +77,19 @@ var check_border_collision = (snake_state) => {
   };
 };
 var killIfOnTheBorder = (snake_head) => {
-  return snake_head.x >= BORDER_RIGHT_BLOCK - 1 || snake_head.x <= BORDER_LEFT || snake_head.y >= BORDER_UP_BLOCK - 1 || snake_head.y <= BORDER_DOWN;
+  return snake_head.x >= BORDER_RIGHT_BLOCK - 1 || snake_head.x < BORDER_LEFT || snake_head.y >= BORDER_UP_BLOCK - 1 || snake_head.y < BORDER_DOWN;
 };
+
+// src/app/position_randomizer.js
+var position_randomizer = () => ({
+  random_position: () => ({ x: random_x(), y: random_y() })
+});
+var random_x = () => Math.floor(Math.random() * BORDER_RIGHT_BLOCK);
+var random_y = () => Math.floor(Math.random() * BORDER_UP_BLOCK);
 
 // src/app/snake_game.js
 var snake_bloc = (x) => x * BLOCK_SIZE;
+var apple_bloc = (x) => x * BLOCK_SIZE + BLOCK_SIZE / 2;
 var state = {
   snake_state: {
     direction: RIGHT,
@@ -92,14 +101,16 @@ var state = {
     ],
     died: false
   },
-  apple_state: { position: null }
+  apple_state: { position: null },
+  speed: 120,
+  interval: 0
 };
 var canvas_setup = () => {
   const root_element = document.querySelector("#game");
   const canvas = document.createElement("canvas");
   canvas.width = BORDER_RIGHT;
   canvas.height = BORDER_UP;
-  canvas.style.border = "3px solid black";
+  canvas.style.border = "15px solid black";
   root_element.appendChild(canvas);
   return canvas.getContext("2d");
 };
@@ -127,23 +138,39 @@ var keyboard_setup = (ctx) => {
   });
 };
 var launch_game = (ctx) => {
-  requestAnimationFrame(refresh_canvas(ctx));
+  state.interval = setInterval(refresh_canvas(ctx), state.speed);
 };
 var refresh_canvas = (ctx) => () => {
   ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
   if (is_not_died_snake(state.snake_state)) {
+    if (there_is_no_apple(state.apple_state.position)) {
+      state.apple_state.position = position_randomizer().random_position();
+    }
     draw_snake(state.snake_state.body, ctx);
-    ctx.save();
+    draw_apple(ctx, state.apple_state.position);
     state.snake_state = move_snake(state.snake_state);
     state.snake_state = check_border_collision(state.snake_state);
-    requestAnimationFrame(refresh_canvas(ctx));
-  } else
+  } else {
+    clearInterval(state.interval);
+    console.log("ee", state.snake_state.body);
     draw_snake(state.snake_state.body, ctx);
+  }
+};
+var there_is_no_apple = (position) => position === null;
+var draw_apple = (ctx, position) => {
+  ctx.fillStyle = "green";
+  ctx.beginPath();
+  ctx.arc(apple_bloc(position.x), apple_bloc(position.y), BLOCK_SIZE / 2, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+  ctx.save();
 };
 var draw_snake = (snake2, ctx) => {
   const [head, ...body] = snake2;
   draw_snake_head(head, ctx);
   draw_snake_body(body, ctx);
+  ctx.save();
 };
 var draw_snake_head = (head, ctx) => {
   ctx.fillStyle = "red";

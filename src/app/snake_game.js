@@ -11,9 +11,12 @@ import {
 } from "../constants.js";
 import {move_snake, turn_snake} from "../core/snake.js";
 import {check_border_collision} from "../core/game_area.js";
+import {position_randomizer} from "./position_randomizer.js";
+import {create_apple} from "../core/apple.js";
 
 
 const snake_bloc = (x) => x * BLOCK_SIZE;
+const apple_bloc = (x) => x * BLOCK_SIZE + (BLOCK_SIZE/2);
 
 
 
@@ -28,7 +31,9 @@ export const state = {
         ],
         died: false
     },
-    apple_state: {position: null}
+    apple_state: {position: null},
+    speed: 120,
+    interval: 0
 }
 
 const canvas_setup = () => {
@@ -36,7 +41,7 @@ const canvas_setup = () => {
     const canvas = document.createElement("canvas");
     canvas.width = BORDER_RIGHT;
     canvas.height = BORDER_UP;
-    canvas.style.border = "3px solid black"
+    canvas.style.border = "15px solid black"
     root_element.appendChild(canvas);
     return canvas.getContext("2d");
 }
@@ -65,25 +70,42 @@ const keyboard_setup = (ctx) => {
 }
 
 const launch_game = (ctx) => {
-    requestAnimationFrame(refresh_canvas(ctx))
+    state.interval = setInterval(refresh_canvas(ctx), state.speed);
 }
 
 const refresh_canvas = (ctx) => () => {
     ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
     if(is_not_died_snake(state.snake_state)){
-        draw_snake(state.snake_state.body, ctx)
-        ctx.save();
+        if(there_is_no_apple(state.apple_state.position)){
+            state.apple_state = create_apple(position_randomizer())(state.snake_state.body);
+        }
+        draw_snake(state.snake_state.body, ctx);
+        draw_apple(ctx, state.apple_state.position);
         state.snake_state = move_snake(state.snake_state);
         state.snake_state = check_border_collision(state.snake_state);
-        requestAnimationFrame(refresh_canvas(ctx));
-    }else draw_snake(state.snake_state.body, ctx);
+    }else {
+        draw_snake(state.snake_state.body, ctx);
+        clearInterval(state.interval);
+    }
+}
 
+const there_is_no_apple = (position) => position === null;
+
+const draw_apple = (ctx, position) => {
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.arc(apple_bloc(position.x), apple_bloc(position.y), BLOCK_SIZE/2, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+    ctx.save();
 }
 
 const draw_snake = (snake, ctx) => {
     const [head, ...body] = snake;
     draw_snake_head(head, ctx);
     draw_snake_body(body, ctx);
+    ctx.save();
 }
 
 const draw_snake_head = (head, ctx) => {

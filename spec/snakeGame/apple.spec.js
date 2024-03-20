@@ -22,16 +22,14 @@ describe("An Apple in the Game", () => {
     })
 
     it("appears randomly somewhere in the game area", () => {
-        const snake_position = {head: {x: 1, y: 1}, body: [{x: 2, y: 1}]}
-        apple_state = create_apple(position_randomizer)(snake_position);
+        const snake_body = [{x: 1, y: 1}, {x: 2, y: 1}];
+        apple_state = create_apple(position_randomizer)(snake_body);
         expect(apple_state.position).toEqual({x: 14, y: 15})
     })
 
     it("cannot appears on the snake", () => {
-        const snake_position = {
-            head: {x: 15, y: 15},
-            body: [{x: 14, y: 15}, {x: 13, y: 15}, {x: 12, y: 15}]}
-        apple_state = create_apple(position_randomizer)(snake_position);
+        const snake_body =[{x: 15, y: 15}, {x: 14, y: 15}, {x: 13, y: 15}, {x: 12, y: 15}];
+        apple_state = create_apple(position_randomizer)(snake_body);
         expect(apple_state.position).not.toEqual({x: 14, y: 15});
     })
 })

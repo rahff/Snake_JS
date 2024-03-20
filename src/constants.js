@@ -5,6 +5,7 @@ export const LEFT = "LEFT";
 
 export const opposite_directions = {
     [UP]: DOWN,
+    [DOWN]: UP,
     [LEFT]: RIGHT,
     [RIGHT]: LEFT
 }
@@ -31,5 +32,5 @@ export const ENTER_KEY = "Enter";
 export const ESCAPE_KEY = "Escape";
 
 export const BLOCK_SIZE = 30;
-export const BORDER_RIGHT_BLOCK = BORDER_RIGHT/BLOCK_SIZE
-export const BORDER_UP_BLOCK = BORDER_UP/BLOCK_SIZE
+export const BORDER_RIGHT_BLOCK = BORDER_RIGHT/BLOCK_SIZE +1
+export const BORDER_UP_BLOCK = BORDER_UP/BLOCK_SIZE+1
