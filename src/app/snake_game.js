@@ -110,14 +110,13 @@ const refresh_canvas = (ctx) => () => {
     if(is_not_died_snake(state.snake_state)){
         draw_game_sprites(state, ctx);
         step_forward();
-        if_apple_eaten();
     }else loose_game(ctx);
 }
 
 const loose_game = (ctx) => {
     clearInterval(state.interval);
     draw_snake(state.snake_state.body, ctx);
-    draw_score(state.score, ctx)
+    draw_score(state.score, ctx);
 }
 
 const if_apple_eaten = () => {
@@ -128,6 +127,7 @@ const step_forward = () => {
     state.snake_state = move_snake(state.snake_state);
     state.snake_state = check_border_collision(state.snake_state);
     state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
+    if_apple_eaten();
 }
 
 const is_not_died_snake = (snake_state) => !snake_state.died;
