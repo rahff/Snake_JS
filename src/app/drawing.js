@@ -23,12 +23,25 @@ export const draw_snake = (snake, ctx) => {
 
 const draw_snake_head = (head, ctx) => {
     ctx.fillStyle = "red";
-    ctx.fillRect(snake_bloc(head.x), snake_bloc(head.y), BLOCK_SIZE, BLOCK_SIZE);
+    ctx.beginPath();
+    ctx.roundRect(snake_bloc(head.x), snake_bloc(head.y), BLOCK_SIZE, BLOCK_SIZE, 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
 }
 
 const draw_snake_body = (body, ctx) => {
     ctx.fillStyle = "black";
     body.forEach(block => ctx.fillRect(snake_bloc(block.x), snake_bloc(block.y), BLOCK_SIZE, BLOCK_SIZE));
+}
+
+export const draw_score = (score, ctx) => {
+    ctx.fillStyle = "light-grey";
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(score.toString(), 15, 15);
+    ctx.save();
 }
 
 const snake_bloc = (x) => x * BLOCK_SIZE;

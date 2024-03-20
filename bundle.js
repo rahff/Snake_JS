@@ -27,6 +27,8 @@ var ENTER_KEY = "Enter";
 var BLOCK_SIZE = 30;
 var BORDER_RIGHT_BLOCK = BORDER_RIGHT / BLOCK_SIZE + 1;
 var BORDER_UP_BLOCK = BORDER_UP / BLOCK_SIZE + 1;
+var APPLE_EATEN_EVENT = "apple_eaten";
+var NEXT_LEVEL_REACHED_EVENT = "next_level_reached";
 
 // src/core/common.js
 var position_equal = (position, other) => {
@@ -67,9 +69,30 @@ var change_direction = (old_direction, new_direction) => {
   }
   return new_direction;
 };
+var feed_snake = (snake_state) => {
+  const snake_tail = { ...snake_state.body[snake_state.body.length - 1] };
+  return {
+    ...snake_state,
+    body: [...snake_state.body, tail_position(snake_tail, snake_state.direction)]
+  };
+};
+var tail_position = (tail, direction) => {
+  switch (direction) {
+    case RIGHT:
+      return { ...tail, x: --tail.x };
+    case UP:
+      return { ...tail, y: --tail.y };
+    case LEFT:
+      return { ...tail, x: ++tail.x };
+    case DOWN:
+      return { ...tail, y: ++tail.y };
+  }
+};
 
 // src/core/game_area.js
 var check_border_collision = (snake_state) => {
+  if (snake_state.died)
+    return snake_state;
   const snake_head = { ...snake_state.body[0] };
   return {
     ...snake_state,
@@ -84,12 +107,67 @@ var killIfOnTheBorder = (snake_head) => {
 var position_randomizer = () => ({
   random_position: () => ({ x: random_x(), y: random_y() })
 });
-var random_x = () => Math.floor(Math.random() * BORDER_RIGHT_BLOCK);
-var random_y = () => Math.floor(Math.random() * BORDER_UP_BLOCK);
+var random_x = () => Math.floor(Math.random() * (BORDER_RIGHT_BLOCK - 2)) + 1;
+var random_y = () => Math.floor(Math.random() * (BORDER_UP_BLOCK - 2)) + 1;
 
-// src/app/snake_game.js
+// src/core/apple.js
+var create_apple = (positionRandomizer) => (snake_body) => {
+  const apple_position = positionRandomizer.random_position();
+  if (snake_body.some((pos) => position_equal(pos, apple_position)))
+    return create_apple(positionRandomizer)(snake_body);
+  return {
+    eaten_event: null,
+    position: apple_position
+  };
+};
+var is_bitten_by_snake = (apple_generator) => (apple_state, snake_body) => {
+  const snake_head = { ...snake_body[0] };
+  if (position_equal(apple_state.position, snake_head)) {
+    return { ...apple_generator(snake_body), eaten_event: new Event(APPLE_EATEN_EVENT) };
+  }
+  return apple_state;
+};
+
+// src/app/drawing.js
+var draw_apple = (ctx, position) => {
+  ctx.fillStyle = "green";
+  ctx.beginPath();
+  ctx.arc(apple_bloc(position.x), apple_bloc(position.y), BLOCK_SIZE / 2, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+  ctx.save();
+};
+var draw_snake = (snake, ctx) => {
+  const [head, ...body] = snake;
+  draw_snake_head(head, ctx);
+  draw_snake_body(body, ctx);
+  ctx.save();
+};
+var draw_snake_head = (head, ctx) => {
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.roundRect(snake_bloc(head.x), snake_bloc(head.y), BLOCK_SIZE, BLOCK_SIZE, 5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+};
+var draw_snake_body = (body, ctx) => {
+  ctx.fillStyle = "black";
+  body.forEach((block) => ctx.fillRect(snake_bloc(block.x), snake_bloc(block.y), BLOCK_SIZE, BLOCK_SIZE));
+};
+var draw_score = (score, ctx) => {
+  ctx.fillStyle = "light-grey";
+  ctx.font = "24px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(score.toString(), 15, 15);
+  ctx.save();
+};
 var snake_bloc = (x) => x * BLOCK_SIZE;
 var apple_bloc = (x) => x * BLOCK_SIZE + BLOCK_SIZE / 2;
+
+// src/app/snake_game.js
 var state = {
   snake_state: {
     direction: RIGHT,
@@ -101,10 +179,15 @@ var state = {
     ],
     died: false
   },
-  apple_state: { position: null },
+  apple_state: {
+    position: null,
+    eaten_event: null
+  },
   speed: 120,
-  interval: 0
+  interval: 0,
+  score: 0
 };
+var apple_generator = create_apple(position_randomizer());
 var canvas_setup = () => {
   const root_element = document.querySelector("#game");
   const canvas = document.createElement("canvas");
@@ -137,6 +220,22 @@ var keyboard_setup = (ctx) => {
     }
   });
 };
+var game_events_setup = (ctx) => {
+  window.addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
+  window.addEventListener(NEXT_LEVEL_REACHED_EVENT, on_next_level(ctx));
+};
+var on_apple_eaten = () => {
+  state.snake_state = feed_snake(state.snake_state);
+  state.apple_state.eaten_event = null;
+  state.score = ++state.score;
+  if (state.score % 5 === 0)
+    dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
+};
+var on_next_level = (ctx) => () => {
+  state.speed = state.speed - state.speed * 0.04;
+  clearInterval(state.interval);
+  launch_game(ctx);
+};
 var launch_game = (ctx) => {
   state.interval = setInterval(refresh_canvas(ctx), state.speed);
 };
@@ -144,46 +243,27 @@ var refresh_canvas = (ctx) => () => {
   ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
   if (is_not_died_snake(state.snake_state)) {
     if (there_is_no_apple(state.apple_state.position)) {
-      state.apple_state.position = position_randomizer().random_position();
+      state.apple_state = apple_generator(state.snake_state.body);
     }
     draw_snake(state.snake_state.body, ctx);
     draw_apple(ctx, state.apple_state.position);
+    draw_score(state.score, ctx);
     state.snake_state = move_snake(state.snake_state);
     state.snake_state = check_border_collision(state.snake_state);
+    state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
+    if (state.apple_state.eaten_event)
+      dispatchEvent(state.apple_state.eaten_event);
   } else {
-    clearInterval(state.interval);
-    console.log("ee", state.snake_state.body);
     draw_snake(state.snake_state.body, ctx);
+    clearInterval(state.interval);
   }
 };
 var there_is_no_apple = (position) => position === null;
-var draw_apple = (ctx, position) => {
-  ctx.fillStyle = "green";
-  ctx.beginPath();
-  ctx.arc(apple_bloc(position.x), apple_bloc(position.y), BLOCK_SIZE / 2, 0, 2 * Math.PI);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
-  ctx.save();
-};
-var draw_snake = (snake2, ctx) => {
-  const [head, ...body] = snake2;
-  draw_snake_head(head, ctx);
-  draw_snake_body(body, ctx);
-  ctx.save();
-};
-var draw_snake_head = (head, ctx) => {
-  ctx.fillStyle = "red";
-  ctx.fillRect(snake_bloc(head.x), snake_bloc(head.y), BLOCK_SIZE, BLOCK_SIZE);
-};
-var draw_snake_body = (body, ctx) => {
-  ctx.fillStyle = "black";
-  body.forEach((block) => ctx.fillRect(snake_bloc(block.x), snake_bloc(block.y), BLOCK_SIZE, BLOCK_SIZE));
-};
 var is_not_died_snake = (snake_state) => !snake_state.died;
 var init = () => {
   const ctx = canvas_setup();
   keyboard_setup(ctx);
+  game_events_setup(ctx);
 };
 
 // src/index.js

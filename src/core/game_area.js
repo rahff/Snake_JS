@@ -7,8 +7,8 @@ import {
 
 
 export const check_border_collision = (snake_state) => {
+    if(snake_state.died) return snake_state;
     const snake_head = {...snake_state.body[0]};
-
     return {
         ...snake_state,
         died: killIfOnTheBorder(snake_head)

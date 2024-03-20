@@ -34,3 +34,6 @@ export const ESCAPE_KEY = "Escape";
 export const BLOCK_SIZE = 30;
 export const BORDER_RIGHT_BLOCK = BORDER_RIGHT/BLOCK_SIZE +1
 export const BORDER_UP_BLOCK = BORDER_UP/BLOCK_SIZE+1
+
+export const APPLE_EATEN_EVENT = "apple_eaten";
+export const NEXT_LEVEL_REACHED_EVENT = "next_level_reached";
