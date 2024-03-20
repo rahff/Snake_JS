@@ -13,11 +13,7 @@ import {move_snake, turn_snake} from "../core/snake.js";
 import {check_border_collision} from "../core/game_area.js";
 import {position_randomizer} from "./position_randomizer.js";
 import {create_apple} from "../core/apple.js";
-
-
-const snake_bloc = (x) => x * BLOCK_SIZE;
-const apple_bloc = (x) => x * BLOCK_SIZE + (BLOCK_SIZE/2);
-
+import {draw_snake, draw_apple} from "./drawing.js";
 
 
 export const state = {
@@ -91,32 +87,6 @@ const refresh_canvas = (ctx) => () => {
 
 const there_is_no_apple = (position) => position === null;
 
-const draw_apple = (ctx, position) => {
-    ctx.fillStyle = "green";
-    ctx.beginPath();
-    ctx.arc(apple_bloc(position.x), apple_bloc(position.y), BLOCK_SIZE/2, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
-    ctx.save();
-}
-
-const draw_snake = (snake, ctx) => {
-    const [head, ...body] = snake;
-    draw_snake_head(head, ctx);
-    draw_snake_body(body, ctx);
-    ctx.save();
-}
-
-const draw_snake_head = (head, ctx) => {
-    ctx.fillStyle = "red";
-    ctx.fillRect(snake_bloc(head.x), snake_bloc(head.y), BLOCK_SIZE, BLOCK_SIZE);
-}
-
-const draw_snake_body = (body, ctx) => {
-    ctx.fillStyle = "black";
-    body.forEach(block => ctx.fillRect(snake_bloc(block.x), snake_bloc(block.y), BLOCK_SIZE, BLOCK_SIZE));
-}
 
 const is_not_died_snake = (snake_state) => !snake_state.died;
 

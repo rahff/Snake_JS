@@ -1,4 +1,4 @@
-import {BORDER_RIGHT, BORDER_RIGHT_BLOCK, BORDER_UP_BLOCK} from "../constants.js";
+import {BORDER_RIGHT_BLOCK, BORDER_UP_BLOCK} from "../constants.js";
 
 export const position_randomizer = () => ({
     random_position: () => ({x: random_x(), y: random_y()})
