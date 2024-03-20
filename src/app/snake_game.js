@@ -80,6 +80,10 @@ const game_events_setup = (ctx) => {
 const on_apple_eaten = () => {
     state.snake_state = feed_snake(state.snake_state);
     state.apple_state.eaten_event = null;
+    increment_score();
+}
+
+const increment_score = () => {
     state.score = ++state.score;
     if(state.score %5 === 0) dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
 }
