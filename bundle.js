@@ -129,6 +129,11 @@ var is_bitten_by_snake = (apple_generator) => (apple_state, snake_body) => {
 };
 
 // src/app/drawing.js
+var draw_game_sprites = (state, ctx) => {
+  draw_snake(state.snake_state.body, ctx);
+  draw_apple(ctx, state.apple_state.position);
+  draw_score(state.score, ctx);
+};
 var draw_apple = (ctx, position) => {
   ctx.fillStyle = "green";
   ctx.beginPath();
@@ -180,7 +185,7 @@ var state = {
     died: false
   },
   apple_state: {
-    position: null,
+    position: position_randomizer().random_position(),
     eaten_event: null
   },
   speed: 120,
@@ -220,6 +225,10 @@ var keyboard_setup = (ctx) => {
     }
   });
 };
+var launch_game = (ctx) => {
+  if (!state.interval)
+    start_level(ctx);
+};
 var game_events_setup = (ctx) => {
   window.addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
   window.addEventListener(NEXT_LEVEL_REACHED_EVENT, on_next_level(ctx));
@@ -227,38 +236,45 @@ var game_events_setup = (ctx) => {
 var on_apple_eaten = () => {
   state.snake_state = feed_snake(state.snake_state);
   state.apple_state.eaten_event = null;
+  increment_score();
+};
+var increment_score = () => {
   state.score = ++state.score;
-  if (state.score % 5 === 0)
+  if (next_level_reached(state.score))
     dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
 };
+var next_level_reached = (score) => score % 5 === 0;
 var on_next_level = (ctx) => () => {
   state.speed = state.speed - state.speed * 0.04;
   clearInterval(state.interval);
-  launch_game(ctx);
+  start_level(ctx);
 };
-var launch_game = (ctx) => {
+var start_level = (ctx) => {
   state.interval = setInterval(refresh_canvas(ctx), state.speed);
 };
 var refresh_canvas = (ctx) => () => {
   ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
   if (is_not_died_snake(state.snake_state)) {
-    if (there_is_no_apple(state.apple_state.position)) {
-      state.apple_state = apple_generator(state.snake_state.body);
-    }
-    draw_snake(state.snake_state.body, ctx);
-    draw_apple(ctx, state.apple_state.position);
-    draw_score(state.score, ctx);
-    state.snake_state = move_snake(state.snake_state);
-    state.snake_state = check_border_collision(state.snake_state);
-    state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
-    if (state.apple_state.eaten_event)
-      dispatchEvent(state.apple_state.eaten_event);
-  } else {
-    draw_snake(state.snake_state.body, ctx);
-    clearInterval(state.interval);
-  }
+    draw_game_sprites(state, ctx);
+    step_forward();
+    if_apple_eaten();
+  } else
+    loose_game(ctx);
 };
-var there_is_no_apple = (position) => position === null;
+var loose_game = (ctx) => {
+  clearInterval(state.interval);
+  draw_snake(state.snake_state.body, ctx);
+  draw_score(state.score, ctx);
+};
+var if_apple_eaten = () => {
+  if (state.apple_state.eaten_event)
+    dispatchEvent(state.apple_state.eaten_event);
+};
+var step_forward = () => {
+  state.snake_state = move_snake(state.snake_state);
+  state.snake_state = check_border_collision(state.snake_state);
+  state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
+};
 var is_not_died_snake = (snake_state) => !snake_state.died;
 var init = () => {
   const ctx = canvas_setup();

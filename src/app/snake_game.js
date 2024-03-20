@@ -14,7 +14,7 @@ import {feed_snake, move_snake, turn_snake} from "../core/snake.js";
 import {check_border_collision} from "../core/game_area.js";
 import {position_randomizer} from "./position_randomizer.js";
 import {create_apple, is_bitten_by_snake} from "../core/apple.js";
-import {draw_snake, draw_apple, draw_score} from "./drawing.js";
+import {draw_snake, draw_apple, draw_score, draw_game_sprites} from "./drawing.js";
 
 
 export const state = {
@@ -29,7 +29,7 @@ export const state = {
         died: false
     },
     apple_state: {
-        position: null,
+        position: position_randomizer().random_position(),
         eaten_event: null
     },
     speed: 120,
@@ -71,6 +71,9 @@ const keyboard_setup = (ctx) => {
         }
     })
 }
+const launch_game = (ctx) => {
+    if(!state.interval) start_level(ctx);
+}
 
 const game_events_setup = (ctx) => {
     window.addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
@@ -85,16 +88,19 @@ const on_apple_eaten = () => {
 
 const increment_score = () => {
     state.score = ++state.score;
-    if(state.score %5 === 0) dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
+    if(next_level_reached(state.score))
+        dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
 }
+
+const next_level_reached = (score) => score % 5 === 0;
 
 const on_next_level = ctx => () => {
     state.speed = state.speed - (state.speed * 0.04);
     clearInterval(state.interval);
-    launch_game(ctx);
+    start_level(ctx);
 }
 
-const launch_game = (ctx) => {
+const start_level = (ctx) => {
     state.interval = setInterval(refresh_canvas(ctx), state.speed);
 }
 
@@ -102,24 +108,27 @@ const launch_game = (ctx) => {
 const refresh_canvas = (ctx) => () => {
     ctx.clearRect(0, 0, BORDER_RIGHT, BORDER_UP);
     if(is_not_died_snake(state.snake_state)){
-        if(there_is_no_apple(state.apple_state.position)){
-            state.apple_state = apple_generator(state.snake_state.body);
-        }
-        draw_snake(state.snake_state.body, ctx);
-        draw_apple(ctx, state.apple_state.position);
-        draw_score(state.score, ctx);
-        state.snake_state = move_snake(state.snake_state);
-        state.snake_state = check_border_collision(state.snake_state);
-        state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
-        if(state.apple_state.eaten_event) dispatchEvent(state.apple_state.eaten_event);
-    }else {
-        draw_snake(state.snake_state.body, ctx);
-        clearInterval(state.interval);
-    }
+        draw_game_sprites(state, ctx);
+        step_forward();
+        if_apple_eaten();
+    }else loose_game(ctx);
 }
 
-const there_is_no_apple = (position) => position === null;
+const loose_game = (ctx) => {
+    clearInterval(state.interval);
+    draw_snake(state.snake_state.body, ctx);
+    draw_score(state.score, ctx)
+}
 
+const if_apple_eaten = () => {
+    if(state.apple_state.eaten_event)
+        dispatchEvent(state.apple_state.eaten_event);
+}
+const step_forward = () => {
+    state.snake_state = move_snake(state.snake_state);
+    state.snake_state = check_border_collision(state.snake_state);
+    state.apple_state = is_bitten_by_snake(apple_generator)(state.apple_state, state.snake_state.body);
+}
 
 const is_not_died_snake = (snake_state) => !snake_state.died;
 

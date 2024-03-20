@@ -2,6 +2,11 @@ import {BLOCK_SIZE} from "../constants.js";
 
 
 
+export const draw_game_sprites = (state, ctx) => {
+    draw_snake(state.snake_state.body, ctx);
+    draw_apple(ctx, state.apple_state.position);
+    draw_score(state.score, ctx);
+}
 
 
 export const draw_apple = (ctx, position) => {
