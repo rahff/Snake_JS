@@ -293,34 +293,14 @@ var init = (sprites) => {
 };
 
 // src/preload.js
-var sprites_images = {
-  apple: new Image,
-  snake_head_UP: new Image,
-  snake_head_DOWN: new Image,
-  snake_head_RIGHT: new Image,
-  snake_head_LEFT: new Image
-};
 var preload_sprites_images = () => {
-  const apple_sprite = fetch_image(APPLE_IMG);
-  const snake_head_up_sprite = fetch_image(SNAKE_HEAD_IMG_UP);
-  const snake_head_down_sprite = fetch_image(SNAKE_HEAD_IMG_DOWN);
-  const snake_head_right_sprite = fetch_image(SNAKE_HEAD_IMG_RIGHT);
-  const snake_head_left_sprite = fetch_image(SNAKE_HEAD_IMG_LEFT);
   return Promise.all([
-    apple_sprite,
-    snake_head_left_sprite,
-    snake_head_down_sprite,
-    snake_head_right_sprite,
-    snake_head_up_sprite
+    fetch_image(APPLE_IMG),
+    fetch_image(SNAKE_HEAD_IMG_UP),
+    fetch_image(SNAKE_HEAD_IMG_DOWN),
+    fetch_image(SNAKE_HEAD_IMG_RIGHT),
+    fetch_image(SNAKE_HEAD_IMG_LEFT)
   ]).then(handle_response);
-};
-var handle_response = (blobs) => {
-  blobs.forEach((blob) => {
-    blob.data.then((data) => {
-      sprites_images[blob.index].src = URL.createObjectURL(data);
-    });
-  });
-  return sprites_images;
 };
 var fetch_image = (url) => {
   return fetch(url).then((response) => ({
@@ -329,9 +309,25 @@ var fetch_image = (url) => {
   }));
 };
 var get_image_index = (url) => SPRITES_MAP[url];
+var handle_response = async (blobs) => {
+  const sprites_images = {
+    apple: new Image,
+    snake_head_UP: new Image,
+    snake_head_DOWN: new Image,
+    snake_head_RIGHT: new Image,
+    snake_head_LEFT: new Image
+  };
+  const data_images = blobs.map(async (blob) => {
+    const data = await blob.data;
+    return { data, index: blob.index };
+  });
+  const images = await Promise.all(data_images);
+  images.forEach((img) => sprites_images[img.index].src = URL.createObjectURL(img.data));
+  return sprites_images;
+};
 
 // src/index.js
 var main = function() {
-  preload_sprites_images().then((sprites_images2) => init(sprites_images2));
+  preload_sprites_images().then((sprites_images) => init(sprites_images));
 };
 main();
