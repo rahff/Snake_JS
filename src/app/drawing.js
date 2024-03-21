@@ -1,36 +1,31 @@
-import {APPLE_IMG, BLOCK_SIZE, SNAKE_BLOCK_IMG, SNAKE_COLOR, SNAKE_HEAD_IMG} from "../constants.js";
+import {APPLE_IMG, BLOCK_SIZE, SNAKE_COLOR} from "../constants.js";
 import {image_builder} from "../core/common.js";
 
 
 
 export const draw_game_sprites = (state, ctx) => {
-    draw_snake(state.snake_state.body, ctx, state.snake_state.direction);
-    draw_apple(ctx, state.apple_state.position);
+    const snake_head_sprite = state.sprites["snake_head_"+state.snake_state.direction];
+    const apple_sprite = state.sprites["apple"];
+    draw_snake(state.snake_state.body, ctx, snake_head_sprite);
+    draw_apple(ctx, state.apple_state.position, apple_sprite);
     draw_score(state.score, ctx);
 }
 
 
-export const draw_apple = (ctx, position) => {
-    ctx.drawImage(apple_image(), apple_bloc(position.x), apple_bloc(position.y));
+export const draw_apple = (ctx, position, sprite) => {
+    ctx.drawImage(sprite, apple_bloc(position.x), apple_bloc(position.y));
     ctx.save();
 }
 
-const apple_image = () => image_builder(APPLE_IMG)
-
-export const draw_snake = (snake, ctx, direction) => {
+export const draw_snake = (snake, ctx, sprite) => {
     const [head, ...body] = snake;
-    draw_snake_head(head, ctx, direction);
+    draw_snake_head(head, ctx, sprite);
     draw_snake_body(body, ctx);
     ctx.save();
 }
 
-const draw_snake_head = (head, ctx, direction) => {
-    ctx.drawImage(snake_head_image(direction), snake_bloc(head.x), snake_bloc(head.y));
-}
-
-const snake_head_image = (direction) => {
-    const src = SNAKE_HEAD_IMG+direction+".png";
-    return image_builder(src);
+const draw_snake_head = (head, ctx, sprite) => {
+    ctx.drawImage(sprite, snake_bloc(head.x), snake_bloc(head.y));
 }
 
 const draw_snake_body = (body, ctx) => {

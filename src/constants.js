@@ -39,7 +39,18 @@ export const BORDER_UP_BLOCK = BORDER_UP/BLOCK_SIZE+1
 
 export const APPLE_EATEN_EVENT = "apple_eaten";
 export const NEXT_LEVEL_REACHED_EVENT = "next_level_reached";
-export const APPLE_IMG = "../sprites/apple.png"
-export const SNAKE_HEAD_IMG = "../sprites/snake_head_"
+export const SPRITES_MAP = {
+    "/sprites/snake_head_UP.png": "snake_head_UP",
+    "/sprites/snake_head_DOWN.png": "snake_head_DOWN",
+    "/sprites/snake_head_RIGHT.png": "snake_head_RIGHT",
+    "/sprites/snake_head_LEFT.png": "snake_head_LEFT",
+    "/sprites/apple.png": "apple"
+}
+
+export const APPLE_IMG = "/sprites/apple.png";
+export const SNAKE_HEAD_IMG_UP = "/sprites/snake_head_UP.png";
+export const SNAKE_HEAD_IMG_DOWN = "/sprites/snake_head_DOWN.png";
+export const SNAKE_HEAD_IMG_RIGHT = "/sprites/snake_head_RIGHT.png";
+export const SNAKE_HEAD_IMG_LEFT = "/sprites/snake_head_LEFT.png";
 export const SNAKE_COLOR = "#6a9e68";
 

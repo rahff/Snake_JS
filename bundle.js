@@ -2,13 +2,6 @@
 var position_equal = (position, other) => {
   return position.x === other.x && position.y === other.y;
 };
-var image_builder = (src) => {
-  const img = new Image;
-  img.src = src;
-  img.width = 10;
-  img.height = 10;
-  return img;
-};
 
 // src/constants.js
 var RIGHT = "RIGHT";
@@ -41,8 +34,19 @@ var BORDER_RIGHT_BLOCK = BORDER_RIGHT / BLOCK_SIZE + 1;
 var BORDER_UP_BLOCK = BORDER_UP / BLOCK_SIZE + 1;
 var APPLE_EATEN_EVENT = "apple_eaten";
 var NEXT_LEVEL_REACHED_EVENT = "next_level_reached";
-var APPLE_IMG = "../sprites/apple.png";
-var SNAKE_HEAD_IMG = "../sprites/snake_head_";
+var SPRITES_MAP = {
+  "/sprites/snake_head_UP.png": "snake_head_UP",
+  "/sprites/snake_head_DOWN.png": "snake_head_DOWN",
+  "/sprites/snake_head_RIGHT.png": "snake_head_RIGHT",
+  "/sprites/snake_head_LEFT.png": "snake_head_LEFT",
+  "/sprites/apple.png": "apple"
+};
+var APPLE_IMG = "/sprites/apple.png";
+var SNAKE_HEAD_IMG_UP = "/sprites/snake_head_UP.png";
+var SNAKE_HEAD_IMG_DOWN = "/sprites/snake_head_DOWN.png";
+var SNAKE_HEAD_IMG_RIGHT = "/sprites/snake_head_RIGHT.png";
+var SNAKE_HEAD_IMG_LEFT = "/sprites/snake_head_LEFT.png";
+var SNAKE_COLOR = "#6a9e68";
 
 // src/core/snake.js
 var move_snake = (snake_state) => {
@@ -139,30 +143,27 @@ var is_bitten_by_snake = (apple_generator) => (apple_state, snake_body) => {
 
 // src/app/drawing.js
 var draw_game_sprites = (state, ctx) => {
-  draw_snake(state.snake_state.body, ctx, state.snake_state.direction);
-  draw_apple(ctx, state.apple_state.position);
+  const snake_head_sprite = state.sprites["snake_head_" + state.snake_state.direction];
+  const apple_sprite = state.sprites["apple"];
+  draw_snake(state.snake_state.body, ctx, snake_head_sprite);
+  draw_apple(ctx, state.apple_state.position, apple_sprite);
   draw_score(state.score, ctx);
 };
-var draw_apple = (ctx, position) => {
-  ctx.drawImage(apple_image(), apple_bloc(position.x), apple_bloc(position.y));
+var draw_apple = (ctx, position, sprite) => {
+  ctx.drawImage(sprite, apple_bloc(position.x), apple_bloc(position.y));
   ctx.save();
 };
-var apple_image = () => image_builder(APPLE_IMG);
-var draw_snake = (snake, ctx, direction) => {
+var draw_snake = (snake, ctx, sprite) => {
   const [head, ...body] = snake;
-  draw_snake_head(head, ctx, direction);
+  draw_snake_head(head, ctx, sprite);
   draw_snake_body(body, ctx);
   ctx.save();
 };
-var draw_snake_head = (head, ctx, direction) => {
-  ctx.drawImage(snake_head_image(direction), snake_bloc(head.x), snake_bloc(head.y));
-};
-var snake_head_image = (direction) => {
-  const src = SNAKE_HEAD_IMG + direction + ".png";
-  return image_builder(src);
+var draw_snake_head = (head, ctx, sprite) => {
+  ctx.drawImage(sprite, snake_bloc(head.x), snake_bloc(head.y));
 };
 var draw_snake_body = (body, ctx) => {
-  ctx.fillStyle = "#6a9e68";
+  ctx.fillStyle = SNAKE_COLOR;
   body.forEach((block) => {
     ctx.beginPath();
     ctx.roundRect(snake_bloc(block.x), snake_bloc(block.y), BLOCK_SIZE, BLOCK_SIZE, 5);
@@ -198,7 +199,8 @@ var state = {
   },
   speed: 120,
   interval: 0,
-  score: 0
+  score: 0,
+  sprites: null
 };
 var apple_generator = create_apple(position_randomizer());
 var canvas_setup = () => {
@@ -283,14 +285,53 @@ var on_next_level = (ctx) => () => {
   clearInterval(state.interval);
   start_level(ctx);
 };
-var init = () => {
+var init = (sprites) => {
+  state.sprites = sprites;
   const ctx = canvas_setup();
   keyboard_setup(ctx);
   game_events_setup(ctx);
 };
 
+// src/preload.js
+var sprites_images = {
+  apple: new Image,
+  snake_head_UP: new Image,
+  snake_head_DOWN: new Image,
+  snake_head_RIGHT: new Image,
+  snake_head_LEFT: new Image
+};
+var preload_sprites_images = () => {
+  const apple_sprite = fetch_image(APPLE_IMG);
+  const snake_head_up_sprite = fetch_image(SNAKE_HEAD_IMG_UP);
+  const snake_head_down_sprite = fetch_image(SNAKE_HEAD_IMG_DOWN);
+  const snake_head_right_sprite = fetch_image(SNAKE_HEAD_IMG_RIGHT);
+  const snake_head_left_sprite = fetch_image(SNAKE_HEAD_IMG_LEFT);
+  return Promise.all([
+    apple_sprite,
+    snake_head_left_sprite,
+    snake_head_down_sprite,
+    snake_head_right_sprite,
+    snake_head_up_sprite
+  ]).then(handle_response);
+};
+var handle_response = (blobs) => {
+  blobs.forEach((blob) => {
+    blob.data.then((data) => {
+      sprites_images[blob.index].src = URL.createObjectURL(data);
+    });
+  });
+  return sprites_images;
+};
+var fetch_image = (url) => {
+  return fetch(url).then((response) => ({
+    data: response.blob(),
+    index: get_image_index(url)
+  }));
+};
+var get_image_index = (url) => SPRITES_MAP[url];
+
 // src/index.js
 var main = function() {
-  init();
+  preload_sprites_images().then((sprites_images2) => init(sprites_images2));
 };
 main();

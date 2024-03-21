@@ -34,7 +34,8 @@ export const state = {
     },
     speed: 120,
     interval: 0,
-    score: 0
+    score: 0,
+    sprites: null
 }
 
 const apple_generator = create_apple(position_randomizer());
@@ -132,7 +133,9 @@ const on_next_level = ctx => () => {
     start_level(ctx);
 }
 
-export const init = () => {
+export const init = (sprites) => {
+
+    state.sprites = sprites;
     const ctx = canvas_setup();
     keyboard_setup(ctx);
     game_events_setup(ctx);
