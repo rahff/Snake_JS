@@ -14,7 +14,7 @@ import {feed_snake, move_snake, turn_snake} from "../core/snake.js";
 import {check_border_collision} from "../core/game_area.js";
 import {position_randomizer} from "./position_randomizer.js";
 import {create_apple, is_bitten_by_snake} from "../core/apple.js";
-import {draw_snake, draw_apple, draw_score, draw_game_sprites} from "./drawing.js";
+import {draw_game_sprites} from "./drawing.js";
 
 
 export const state = {
@@ -51,7 +51,7 @@ const canvas_setup = () => {
 }
 
 const keyboard_setup = (ctx) => {
-     window.addEventListener("keydown", (event) => {
+     addEventListener("keydown", (event) => {
         switch (event.key){
             case ARROW_RIGHT_KEY:
                 state.snake_state = turn_snake(state.snake_state, RIGHT);
@@ -74,8 +74,8 @@ const keyboard_setup = (ctx) => {
 }
 
 const game_events_setup = (ctx) => {
-    window.addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
-    window.addEventListener(NEXT_LEVEL_REACHED_EVENT, on_next_level(ctx));
+    addEventListener(APPLE_EATEN_EVENT, on_apple_eaten);
+    addEventListener(NEXT_LEVEL_REACHED_EVENT, on_next_level(ctx));
 }
 
 const launch_game = (ctx) => {
@@ -134,7 +134,6 @@ const on_next_level = ctx => () => {
 }
 
 export const init = (sprites) => {
-
     state.sprites = sprites;
     const ctx = canvas_setup();
     keyboard_setup(ctx);

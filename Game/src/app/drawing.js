@@ -1,5 +1,5 @@
-import {APPLE_IMG, BLOCK_SIZE, SNAKE_COLOR} from "../constants.js";
-import {image_builder} from "../core/common.js";
+import {BLOCK_SIZE, SNAKE_COLOR} from "../constants.js";
+
 
 
 
@@ -10,7 +10,6 @@ export const draw_game_sprites = (state, ctx) => {
     draw_apple(ctx, state.apple_state.position, apple_sprite);
     draw_score(state.score, ctx);
 }
-
 
 export const draw_apple = (ctx, position, sprite) => {
     ctx.drawImage(sprite, apple_bloc(position.x), apple_bloc(position.y));
@@ -38,8 +37,8 @@ const draw_snake_body = (body, ctx) => {
 }
 
 export const draw_score = (score, ctx) => {
-    ctx.fillStyle = "light-grey";
-    ctx.font = '24px Arial';
+    ctx.fillStyle = SNAKE_COLOR;
+    ctx.font = '28px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(score.toString(), 15, 15);

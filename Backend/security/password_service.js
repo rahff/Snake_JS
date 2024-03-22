@@ -1,0 +1,1 @@
+export const fake_password_matcher = (encrypted, candidate) => encrypted === candidate;

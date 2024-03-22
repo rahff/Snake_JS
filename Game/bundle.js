@@ -326,7 +326,7 @@ var handle_response = async (blobs) => {
   return sprites_images;
 };
 
-// src/index.js
+// src/index.spec.js
 var main = function() {
   preload_sprites_images().then((sprites_images) => init(sprites_images));
 };
