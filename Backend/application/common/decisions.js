@@ -1,2 +1,2 @@
-export const approve = (data) => ({is_ok: true, data});
-export const reject = (error) => ({is_ok: false, error});
+export const approve = (data) => ({approved: true, data});
+export const reject = (rejected) => ({approved: false, rejected});
