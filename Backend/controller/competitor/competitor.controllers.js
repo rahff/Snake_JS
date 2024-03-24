@@ -9,8 +9,8 @@ export const log_in_controller = (office_authentication_service) => async (req, 
 
 export const participation_controller = (office_participation_service) => async (req, res) => {
     try{
-        const participation_id = req.params.participation_id;
-        const competitor = req.authentication;
+        const participation_id = req.params["participation_id"];
+        const competitor = req["authentication"];
         const result = await office_participation_service(competitor, participation_id);
         res.redirect(result.data.checkout_url);
     }catch (error){

@@ -1,5 +1,5 @@
 import {office_prize_registration_service} from "../../application/competition/office_prize_registration_service.js";
-import {in_memory_save_prize} from "../../data_access/competition/prize_data-access.js";
+import {in_memory_save_prize} from "../../data_access/competition/prize_data_access.js";
 
 describe('Prize office', () => {
     let create_competition_prize;

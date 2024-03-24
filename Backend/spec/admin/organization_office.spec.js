@@ -1,5 +1,5 @@
 import {fake_date_provider} from "../../services/date_time.js";
-import {in_memory_save_competition} from "../../data_access/competition/organization_data-access.js";
+import {in_memory_save_competition} from "../../data_access/competition/organization_data_access.js";
 import {office_organization_service} from "../../application/admin/office_organization_service.js";
 
 

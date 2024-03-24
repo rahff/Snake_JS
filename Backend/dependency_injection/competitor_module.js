@@ -10,7 +10,7 @@ import {fake_checkout_session} from "../services/checkout/checkout.js";
 import {
     in_memory_get_participation,
     in_memory_save_participation
-} from "../data_access/competition/participation-data-access.js";
+} from "../data_access/competition/participation_data_access.js";
 
 export const office_authentication_module = () => {
     const deps = {
