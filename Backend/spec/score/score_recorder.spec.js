@@ -6,6 +6,7 @@ describe('Score Recorder', () => {
     let score_recording;
     let save_score;
     let db;
+
     beforeEach(() => {
         db = [];
         save_score = in_memory_save_score(db);

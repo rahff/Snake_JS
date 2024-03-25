@@ -12,7 +12,7 @@ export const office_participation_checkout_service = (create_participation_check
 }
 
 export const office_participation_register_service = (save_participation, get_participation) => {
-    return async (payment_confirmation) => {
+    return async payment_confirmation => {
         try{
             if(payment_confirmation.status === "REJECTED")
                 return err({message: "payment rejected", ref: payment_confirmation});

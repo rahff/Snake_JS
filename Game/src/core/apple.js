@@ -13,7 +13,10 @@ export const create_apple = (positionRandomizer) => (snake_body) => {
 export const is_bitten_by_snake = (apple_generator) => (apple_state, snake_body) => {
     const snake_head = {...snake_body[0]}
     if(position_equal(apple_state.position, snake_head)) {
-        return {...apple_generator(snake_body),  eaten_event:  new Event(APPLE_EATEN_EVENT)};
+        return {...apple_generator(snake_body),  eaten_event:  new CustomEvent(APPLE_EATEN_EVENT, {detail: {
+                    apple_position: apple_state.position,
+                    snake_head
+                }})};
     }
     return apple_state;
 }

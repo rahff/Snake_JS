@@ -13,7 +13,7 @@ export const unpaid_participation = (competitor, checkout_session) => ({
     paid: false
 })
 
-export const paid_participation = (unpaid_participation) => ({
+export const paid_participation = unpaid_participation => ({
     ...unpaid_participation,
     paid: true
 })
@@ -25,4 +25,4 @@ type Prize = {
 }
 * */
 
-export const one_euro_prize = (competition_id) =>({competition_id, estimated_amount: 1})
+export const one_euro_prize = competition_id =>({competition_id, estimated_amount: 1})

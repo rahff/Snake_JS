@@ -136,7 +136,10 @@ var create_apple = (positionRandomizer) => (snake_body) => {
 var is_bitten_by_snake = (apple_generator) => (apple_state, snake_body) => {
   const snake_head = { ...snake_body[0] };
   if (position_equal(apple_state.position, snake_head)) {
-    return { ...apple_generator(snake_body), eaten_event: NEXT_LEVEL_REACHED({ apple_position: apple_state.position, snake_head }) };
+    return { ...apple_generator(snake_body), eaten_event: new CustomEvent(APPLE_EATEN_EVENT, { detail: {
+      apple_position: apple_state.position,
+      snake_head
+    } }) };
   }
   return apple_state;
 };
@@ -202,7 +205,6 @@ var state = {
   score: 0,
   sprites: null
 };
-var NEXT_LEVEL_REACHED = (data) => new CustomEvent(NEXT_LEVEL_REACHED_EVENT, { detail: data });
 var apple_generator = create_apple(position_randomizer());
 var canvas_setup = () => {
   const root_element = document.querySelector("#game");
@@ -267,25 +269,25 @@ var step_forward = () => {
 };
 var is_not_died_snake = (snake_state) => !snake_state.died;
 var if_apple_eaten = () => {
-  if (state.apple_state.eaten_event)
+  if (state.apple_state.eaten_event) {
     dispatchEvent(state.apple_state.eaten_event);
+  }
 };
 var on_apple_eaten = () => {
   state.snake_state = feed_snake(state.snake_state);
+  increment_score(state.apple_state.eaten_event.detail);
   state.apple_state.eaten_event = null;
-  increment_score();
 };
-var increment_score = () => {
+var increment_score = (position_snapshot) => {
   state.score = ++state.score;
   if (next_level_reached(state.score))
-    dispatchEvent(NEXT_LEVEL_REACHED);
+    dispatchEvent(new CustomEvent(NEXT_LEVEL_REACHED_EVENT, { detail: { ...position_snapshot } }));
 };
 var next_level_reached = (score) => score % 5 === 0;
 var on_next_level = (ctx) => (event) => {
   state.speed = state.speed - state.speed * 0.04;
   clearInterval(state.interval);
-  console.log(event);
-  console.log({ ...state });
+  create_snapshot({ ...state }, event.detail);
   start_level(ctx);
 };
 var init = (sprites) => {
@@ -293,6 +295,10 @@ var init = (sprites) => {
   const ctx = canvas_setup();
   keyboard_setup(ctx);
   game_events_setup(ctx);
+};
+var create_snapshot = (state2, position_snapshot) => {
+  console.log(state2);
+  console.log(position_snapshot);
 };
 
 // src/preload.js

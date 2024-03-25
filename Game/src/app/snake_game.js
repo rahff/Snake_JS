@@ -109,27 +109,29 @@ const step_forward = () => {
 const is_not_died_snake = (snake_state) => !snake_state.died;
 
 const if_apple_eaten = () => {
-    if(state.apple_state.eaten_event)
+    if(state.apple_state.eaten_event){
         dispatchEvent(state.apple_state.eaten_event);
+    }
 }
 
 const on_apple_eaten = () => {
     state.snake_state = feed_snake(state.snake_state);
+    increment_score(state.apple_state.eaten_event.detail);
     state.apple_state.eaten_event = null;
-    increment_score();
 }
 
-const increment_score = () => {
+const increment_score = (position_snapshot) => {
     state.score = ++state.score;
     if(next_level_reached(state.score))
-        dispatchEvent(new Event(NEXT_LEVEL_REACHED_EVENT));
+        dispatchEvent(new CustomEvent(NEXT_LEVEL_REACHED_EVENT, {detail: {...position_snapshot}}));
 }
 
 const next_level_reached = (score) => score % 5 === 0;
 
-const on_next_level = ctx => () => {
+const on_next_level = ctx => (event) => {
     state.speed = state.speed - (state.speed * 0.04);
     clearInterval(state.interval);
+    create_snapshot({...state}, event.detail);
     start_level(ctx);
 }
 
@@ -139,3 +141,24 @@ export const init = (sprites) => {
     keyboard_setup(ctx);
     game_events_setup(ctx);
 }
+
+
+const create_snapshot = (state, position_snapshot) => {
+    const snapshot = {
+        apple_position: position_snapshot.apple_position,
+        snake_head: position_snapshot.snake_head,
+        speed: state.speed,
+        score: state.score,
+        code: generate_code(state.interval, state.speed, state.score),
+        competition_id: window.location.pathname.split('/')[1]
+    }
+    fetch("/snapshot", {
+        body: snapshot,
+        method: "POST",
+        headers: {
+            "Authorization": "jwt_token"
+        }
+    }).then()
+}
+
+const generate_code = (i, sp, sc) => (sp * i) - sc
