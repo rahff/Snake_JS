@@ -297,9 +297,23 @@ var init = (sprites) => {
   game_events_setup(ctx);
 };
 var create_snapshot = (state2, position_snapshot) => {
-  console.log(state2);
-  console.log(position_snapshot);
+  const snapshot = {
+    apple_position: position_snapshot.apple_position,
+    snake_head: position_snapshot.snake_head,
+    speed: state2.speed,
+    score: state2.score,
+    code: generate_code(state2.interval, state2.speed, state2.score),
+    competition_id: window.location.pathname.split("/")[1]
+  };
+  fetch("/snapshot", {
+    body: snapshot,
+    method: "POST",
+    headers: {
+      Authorization: "jwt_token"
+    }
+  }).then();
 };
+var generate_code = (i, sp, sc) => sp * i - sc;
 
 // src/preload.js
 var preload_sprites_images = () => {

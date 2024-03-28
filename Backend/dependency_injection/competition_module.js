@@ -1,32 +1,12 @@
-import {fake_checkout_session} from "../services/checkout/checkout.js";
-import {
-    in_memory_get_participation,
-    in_memory_save_participation
-} from "../data_access/competition/participation_data_access.js";
-import {
-    office_participation_checkout_service,
-    office_participation_register_service
-} from "../application/competition/office_participation_service.js";
+import {competition_db} from "../data_access/competition/in_memory_data.js";
+import {organize_competition} from "../application/competition/organization_service.js";
+import {in_memory_save_competition} from "../data_access/competition/organization_data_access.js";
+import {date_provider} from "../services/date_time.js";
 
-export const office_participation_module = () => {
-    const deps = {
-        create_checkout: process.env.TESTING ? fake_checkout_session : null,
-        save_participation: process.env.TESTING ? in_memory_save_participation : null
-    };
-    return office_participation_checkout_service(
-        deps.create_checkout,
-        deps.save_participation
-    );
-}
 
-export const office_participation_register_module = () => {
-    const deps = {
-        save_participation: process.env.TESTING ? in_memory_save_participation : null,
-        get_participation:  process.env.TESTING ? in_memory_get_participation : null
-    }
 
-    return office_participation_register_service(
-        deps.save_participation,
-        deps.get_participation
-    );
+export const competition_module = {
+    organization_service: organize_competition(
+        in_memory_save_competition(competition_db.competitions),
+        date_provider)
 }

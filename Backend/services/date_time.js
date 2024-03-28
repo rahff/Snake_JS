@@ -9,3 +9,7 @@ export const fake_date_provider = {
     },
     date_in_past: () => new Date(2024, 2, 21)
 }
+
+export const date_provider = {
+    now: () => new Date()
+}

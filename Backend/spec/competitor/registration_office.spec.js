@@ -1,7 +1,7 @@
-import {office_registration_service} from "../../application/competitor/office_registration_service.js";
+import {registration_service} from "../../application/competitor/registration_service.js";
 import {in_memory_save_competition} from "../../data_access/competition/organization_data_access.js";
 import {fake_hash_password} from "../../services/security/password_service.js";
-import {fake_email_checker} from "../../data_access/competitor/competitor_data_access.js";
+import {fake_email_checker, in_memory_save_competitor} from "../../data_access/competitor/competitor_data_access.js";
 
 
 
@@ -14,10 +14,10 @@ describe('Registration office', () => {
 
     beforeEach(() => {
         db = [];
-        save_competitor = in_memory_save_competition(db);
+        save_competitor = in_memory_save_competitor(db);
         hash_password = fake_hash_password;
         is_email_exist = fake_email_checker;
-        competitor_registration = office_registration_service(save_competitor, is_email_exist, hash_password);
+        competitor_registration = registration_service(save_competitor, is_email_exist, hash_password);
     });
 
     it("A random guy registers to take part in competitions", async () => {

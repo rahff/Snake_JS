@@ -1,4 +1,4 @@
-import {office_authentication_service} from "../../application/competitor/office_authentication_service.js";
+import {authentication_service} from "../../application/competitor/authentication_service.js";
 import {in_memory_get_competitor} from "../../data_access/competitor/competitor_data_access.js";
 import {fake_password_matcher} from "../../services/security/password_service.js";
 import {fake_jwt_token_builder} from "../../services/security/jwt_service.js";
@@ -7,9 +7,11 @@ import {fake_jwt_token_builder} from "../../services/security/jwt_service.js";
 
 describe('Authentication office', () => {
     let competitor_log_in;
+    let db;
 
     beforeEach(() => {
-        competitor_log_in = office_authentication_service(in_memory_get_competitor, fake_password_matcher, fake_jwt_token_builder);
+        db = [{id: "123", email: "rahff@gmail.com", password: "########"}];
+        competitor_log_in = authentication_service(in_memory_get_competitor(db), fake_password_matcher, fake_jwt_token_builder);
     })
 
     it("a competitor identify himself to enter the competition office", async () => {

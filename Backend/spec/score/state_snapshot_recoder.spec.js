@@ -1,5 +1,5 @@
 import {in_memory_save_snapshot} from "../../data_access/score/score_data_access.js";
-import {state_snapshot_recorder} from "../../application/score/office_score_registration_service.js";
+import {state_snapshot_recording} from "../../application/score/score_recording.js";
 
 describe('State Snapshot recorder', () => {
 
@@ -10,7 +10,7 @@ describe('State Snapshot recorder', () => {
     beforeEach(() => {
         db = [];
         save_snapshot = in_memory_save_snapshot(db);
-        record_snapshot = state_snapshot_recorder(save_snapshot)
+        record_snapshot = state_snapshot_recording(save_snapshot)
     });
 
     it("A significant event occured during a competition game session", async () => {

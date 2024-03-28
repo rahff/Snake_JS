@@ -1,22 +1,22 @@
 import {fake_date_provider} from "../../services/date_time.js";
 import {in_memory_save_competition} from "../../data_access/competition/organization_data_access.js";
-import {office_organization_service} from "../../application/admin/office_organization_service.js";
+import {organize_competition} from "../../application/competition/organization_service.js";
 
 
 
 
 describe('Organization office', () => {
-    let organize_competition;
+    let _organize_competition;
     let create_competition;
     let competition_db;
 
     beforeEach(() => {
         competition_db = [];
         create_competition = in_memory_save_competition(competition_db);
-        organize_competition = office_organization_service(create_competition, fake_date_provider);
+        _organize_competition = organize_competition(create_competition, fake_date_provider);
     });
 
-    it("A admin organizes a new competition", async () => {
+    it("A game organizes a new competition", async () => {
         const validated_form_data = {
             id: "competition_id",
             name: "The snake game",
@@ -27,8 +27,9 @@ describe('Organization office', () => {
             img_miniature: "http://s3_bucket/competition_id/The snake game.png",
             game_id: 1
         }
-        const result = await organize_competition(validated_form_data);
+        const result = await _organize_competition(validated_form_data);
         expect(result.is_ok).toBeTrue();
+        expect(result.data).toEqual({id: "competition_id"});
         expect(competition_db).toContain(validated_form_data);
     });
 
@@ -41,7 +42,7 @@ describe('Organization office', () => {
                 end: fake_date_provider.of(2024, 3, 5)
             }
         };
-        const result = await organize_competition(validated_form_data);
+        const result = await _organize_competition(validated_form_data);
         expect(result.is_ok).toBeFalse();
         expect(competition_db).not.toContain(validated_form_data)
     });
@@ -55,7 +56,7 @@ describe('Organization office', () => {
                 end: fake_date_provider.date_in_past()
             }
         };
-        const result = await organize_competition(validated_form_data);
+        const result = await _organize_competition(validated_form_data);
         expect(result.is_ok).toBeFalse();
         expect(competition_db).not.toContain(validated_form_data)
     });

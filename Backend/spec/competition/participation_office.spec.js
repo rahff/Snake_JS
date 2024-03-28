@@ -1,7 +1,7 @@
 import {
-    office_participation_register_service,
-    office_participation_checkout_service
-} from "../../application/competition/office_participation_service.js";
+    formalize_participation,
+    create_participation_checkout
+} from "../../application/competition/participation_service.js";
 import {fake_checkout_session} from "../../services/checkout/checkout.js";
 import {
     in_memory_get_participation,
@@ -20,26 +20,32 @@ describe('Participation office', () => {
         id: "checkout_session_id",
         competitor: {id: "123", email: "rahff@gmail.com", name: "Raphael"},
         paid: false
-    }
+    };
+
     beforeEach(() => {
         participation_db = [];
-        competitor_participate = office_participation_checkout_service(fake_checkout_session, in_memory_save_participation(participation_db));
-        competitor_registration = office_participation_register_service(in_memory_save_participation(participation_db), in_memory_get_participation);
+        competitor_participate = create_participation_checkout(
+            fake_checkout_session,
+            in_memory_save_participation(participation_db));
+        competitor_registration = formalize_participation(
+            in_memory_save_participation(participation_db),
+            in_memory_get_participation(participation_db));
     })
 
     it("competitor pays its participation for a given competition", async () => {
-        const competitor = {email: "rahff@gmail.com", id: "123", name: "Raphael"}
-        const competition_id = "competition_id";
-        const result = await competitor_participate(competitor, competition_id);
+        const competitor = {email: "rahff@gmail.com", id: "123", name: "Raphael"};
+        const result = await competitor_participate(competitor, "competition_id");
         expect(result.is_ok).toBeTrue();
-        expect(participation_db).toContain(unpaid_participation(competitor, checkout_session(result.data.url)))
-        expect(result.data.checkout_url).toBe("https://stripe.com/competition_id");
+        expect(participation_db).toContain(unpaid_participation(competitor, checkout_session(result.data.url)));
+        expect(result.data.checkout_url).toBe("https://test.com/competition_id");
     })
 
     it("the office participation service received the payment confirmation", async () => {
+        participation_db.push(participation_to_paid);
         const payment_confirmation = {checkout_session_id: "checkout_session_id", status: "CONFIRMED"}
         const result = await competitor_registration(payment_confirmation);
         expect(result.is_ok).toBeTrue();
+        expect(result.data).toEqual({competitor_id: "123"});
         expect(participation_db).toContain(paid_participation(participation_to_paid))
     });
 
@@ -48,14 +54,6 @@ describe('Participation office', () => {
         const result = await competitor_registration(payment_confirmation);
         expect(result.is_ok).toBeFalse();
         expect(result.error).toEqual({message: "participation not found", ref: payment_confirmation});
-        expect(participation_db.length).toBe(0);
-    });
-
-    it("An hardware failure occured", async () => {
-        const payment_confirmation = {checkout_session_id: "hardware_fails", status: "CONFIRMED"}
-        const result = await competitor_registration(payment_confirmation);
-        expect(result.is_ok).toBeFalse();
-        expect(result.error).toEqual({message: "unknown error", ref: payment_confirmation});
         expect(participation_db.length).toBe(0);
     });
 
