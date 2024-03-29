@@ -9,7 +9,7 @@ import {api_router} from "./routes/api/api.routes.js";
 import {cspConfig} from "./config.js";
 
 
-const app = express();
+export const app = express();
 
 
 app.set('views', join(__dirname, 'views'));

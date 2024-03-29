@@ -1,4 +1,4 @@
-import {else_fn, ok_fn, unwrap_fn} from "../../application/common/common.js";
+import {else_fn, err, ok_fn, unwrap_fn} from "../../application/common/common.js";
 
 export const bad_request_exception = res => result => {
     res.status(400).json(result.error);
@@ -16,7 +16,14 @@ export const ok_status = res => (_) => {
     res.status(200).end();
 }
 
-export const internal_server_exception = res => error => res.status(500).json(error);
+export const ok_status_result = res => result => {
+    res.status(200).json(result.data);
+}
+
+export const internal_server_exception = res => error => {
+    console.log("err ", error)
+    res.status(500).json(error);
+}
 
 export const command = async (service, ...args) => {
     const result = await service(...args);

@@ -24,7 +24,7 @@ describe('Prize office', () => {
         get_prize = in_memory_get_prize(db);
         _create_competition_prize = create_competition_prize(save_prize);
         _increment_competition_prize = increment_competition_prize(save_prize, get_prize);
-    })
+    });
 
     it("create a 1 € prize for the created competition", async () => {
         const result = await create_prize();
@@ -38,5 +38,5 @@ describe('Prize office', () => {
         const result = await _increment_competition_prize(competitor_participated_event);
         expect(result.is_ok).toBeTrue();
         expect(db).toContain({competition_id: "competition_id", estimated_amount: 2});
-    })
+    });
 });

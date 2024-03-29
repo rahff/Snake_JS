@@ -42,10 +42,10 @@ describe('Participation office', () => {
 
     it("the office participation service received the payment confirmation", async () => {
         participation_db.push(participation_to_paid);
-        const payment_confirmation = {checkout_session_id: "checkout_session_id", status: "CONFIRMED"}
+        const payment_confirmation = {checkout_session_id: "checkout_session_id", status: "CONFIRMED", competition_id: "competition_id"}
         const result = await competitor_registration(payment_confirmation);
         expect(result.is_ok).toBeTrue();
-        expect(result.data).toEqual({competitor_id: "123"});
+        expect(result.data).toEqual({competitor_id: "123", competition_id: "competition_id"});
         expect(participation_db).toContain(paid_participation(participation_to_paid))
     });
 

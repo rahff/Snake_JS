@@ -1,6 +1,5 @@
 import {registration_service} from "../../application/competitor/registration_service.js";
-import {in_memory_save_competition} from "../../data_access/competition/organization_data_access.js";
-import {fake_hash_password} from "../../services/security/password_service.js";
+import {noop_hash_password} from "../../services/security/password_service.js";
 import {fake_email_checker, in_memory_save_competitor} from "../../data_access/competitor/competitor_data_access.js";
 
 
@@ -15,7 +14,7 @@ describe('Registration office', () => {
     beforeEach(() => {
         db = [];
         save_competitor = in_memory_save_competitor(db);
-        hash_password = fake_hash_password;
+        hash_password = noop_hash_password;
         is_email_exist = fake_email_checker;
         competitor_registration = registration_service(save_competitor, is_email_exist, hash_password);
     });
@@ -27,19 +26,19 @@ describe('Registration office', () => {
             password: "Mot2$asse"
         };
         const decision = await competitor_registration(validate_form_data);
-        expect(decision.approved).toBeTrue();
+        expect(decision.is_ok).toBeTrue();
         expect(decision.data).toEqual("rahff@gmail.com"); // for sending email confirmation
-        expect(db).toContain({...validate_form_data, password: "########", verified: false});
+        expect(db).toContain({...validate_form_data, password: "Mot2$asse", verified: false});
     });
 
     it("cannot use an email that already registered", async () => {
-        const validate_form_data = {
+        const validated_form_data = {
             name: "Rahff",
             email: "exist@gmail.com",
             password: "Mot2$asse"
         };
-        const decision = await competitor_registration(validate_form_data);
-        expect(decision.rejected).toEqual({reason: "email already exist"});
+        const decision = await competitor_registration(validated_form_data);
+        expect(decision.error).toEqual({message: "email already exist"});
         expect(db.length).toBe(0);
     });
 });

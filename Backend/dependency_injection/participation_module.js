@@ -16,7 +16,7 @@ export const participation_module = {
         fake_checkout_session,
         in_memory_save_participation(competition_db.participations)),
     registration_service: formalize_participation(
-        in_memory_save_participation(competition_db.competitions),
-        in_memory_get_participation(competition_db.competitions)
+        in_memory_save_participation(competition_db.participations),
+        in_memory_get_participation(competition_db.participations)
     )
 }

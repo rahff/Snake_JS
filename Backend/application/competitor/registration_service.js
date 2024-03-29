@@ -1,4 +1,4 @@
-import {approve, query, reject} from "../common/common.js";
+import {ok, query, err} from "../common/common.js";
 import {non_verified_competitor} from "./model.js";
 
 
@@ -14,7 +14,7 @@ export const registration_service = (save, is_email_exist, hash_password) => {
 const credentials_approving = (save, hash_password, credentials) => async _ => {
     const competitor = non_verified_competitor(credentials, hash_password(credentials.password));
     await save(competitor);
-    return approve(competitor.email);
+    return ok(competitor.email);
 }
 
-const email_rejection = () => reject({reason: "email already exist"});
+const email_rejection = () => err({message: "email already exist"});

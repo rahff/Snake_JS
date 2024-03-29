@@ -26,18 +26,18 @@ export const formalize_participation = (save_participation, get_participation) =
     }
 }
 
-const apply_participation_payment = (get_participation, save_participation) => async (result) => {
-    const {checkout_session_id} = result.data;
+const apply_participation_payment = (get_participation, save_participation) => async result => {
+    const {checkout_session_id, competition_id} = result.data;
     return query(get_participation, checkout_session_id)
-        .then(_ => _.if_present(mark_as_paid(save_participation)))
+        .then(_ => _.if_present(mark_as_paid(save_participation, competition_id)))
         .then(_ => _.or_else_do(error_not_found(result.data)))
         .catch(error => err(error));
 }
 
-const mark_as_paid = save_participation => async unpaid_participation => {
+const mark_as_paid = (save_participation, competition_id) => async (unpaid_participation) => {
     const participation = paid_participation(unpaid_participation);
     await save_participation(participation);
-    return ok({competitor_id: participation.competitor.id});
+    return ok({competitor_id: participation.competitor.id, competition_id});
 }
 
 const error_not_found = ref => () => err({message: "participation not found", ref});

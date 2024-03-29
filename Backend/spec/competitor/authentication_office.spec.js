@@ -10,21 +10,20 @@ describe('Authentication office', () => {
     let db;
 
     beforeEach(() => {
-        db = [{id: "123", email: "rahff@gmail.com", password: "########"}];
+        db = [{id: "123", email: "rahff@gmail.com", password: "123456"}];
         competitor_log_in = authentication_service(in_memory_get_competitor(db), fake_password_matcher, fake_jwt_token_builder);
     })
 
     it("a competitor identify himself to enter the competition office", async () => {
         const log_in_req = {email: "rahff@gmail.com", password: "123456"};
-        const decision = await competitor_log_in(log_in_req);
-        expect(decision.approved).toBeTrue();
-        expect(decision.data).toEqual({token: "jwt_token_rahff@gmail.com"});
+        const result = await competitor_log_in(log_in_req);
+        expect(result.is_ok).toBeTrue();
+        expect(result.data).toEqual({token: "jwt_token_rahff@gmail.com"});
     })
 
     it("a imposter try to identify himself to enter the competition office", async () => {
         const log_in_req = {email: "imposter@gmail.com", password: "%%%%%"};
-        const decision = await competitor_log_in(log_in_req);
-        expect(decision.rejected).toEqual({reason: "invalid credentials"});
-
+        const result = await competitor_log_in(log_in_req);
+        expect(result.error).toEqual({message: "invalid credentials"});
     })
 });

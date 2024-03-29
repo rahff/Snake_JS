@@ -3,14 +3,15 @@ import {
     bad_request_exception,
     command,
     internal_server_exception,
-    ok_status,
+     ok_status_result,
     unauthorized_exception
 } from "../common/common.js";
-import {registration_service} from "../../application/competitor/registration_service.js";
+
+
 
 export const log_in_controller = (authentication_service) => {
     return async (req, res) => {
-        doing(credentials_validation, req.body)
+        return doing(credentials_validation, req.body)
             .is_ok_do(try_log_in(authentication_service, res))
             .then(_ => _.or_else_do(unauthorized_exception(res)))
             .catch(internal_server_exception(res));
@@ -19,7 +20,7 @@ export const log_in_controller = (authentication_service) => {
 
 const try_log_in = (login_command, res) => async (credentials) => {
     return command(login_command, credentials.data)
-        .then(_ => _.is_ok_do(ok_status(res)))
+        .then(_ => _.is_ok_do(ok_status_result(res)))
         .then(_ => _.or_else_do(unauthorized_exception(res)));
 }
 
@@ -37,14 +38,14 @@ export const register_competitor_controller = (registration_service, authenticat
 }
 
 const try_to_signup = (registration_service, authentication_service, res) => async user_infos => {
-    return command(registration_service, user_infos)
-        .then(_ => _.is_ok_do_async(authenticate(authentication_service)))
+    return command(registration_service, user_infos.data)
+        .then(_ => _.is_ok_do_async(authenticate(authentication_service, res, user_infos.data.password)))
         .then(_ =>_.or_else_do(internal_server_exception(res)))
         .catch(internal_server_exception(res));
 }
 
-const authenticate = (authentication_service, res) => async credentials => {
-    const {email, password} = credentials.data;
+const authenticate = (authentication_service, res, password) => async email_result => {
+    const email = email_result.data;
     const result = await authentication_service({email, password});
     res.status(200).json(result.data);
     return result;

@@ -1,7 +1,5 @@
 export const ok = data => ({is_ok: true, data});
 export const err = error => ({is_ok: false, error});
-export const approve = data => ({approved: true, data});
-export const reject = rejected => ({approved: false, rejected});
 
 
 export const doing = (fn, ...args) => {
@@ -59,7 +57,7 @@ export const ok_fn = result => async fn => {
 
 
 export const else_fn = result => fn => {
-    if(!result.is_ok) fn(result);
+    if(!result?.is_ok) fn(result);
     return result;
 }
 

@@ -17,6 +17,7 @@
     "jose": "^5.2.3"
   },
   "devDependencies": {
-    "jasmine": "^5.1.0"
+    "jasmine": "^5.1.0",
+    "supertest": "^6.3.4"
   }
 }

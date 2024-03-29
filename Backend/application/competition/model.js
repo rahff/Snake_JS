@@ -30,6 +30,7 @@ type Participation = {
     id: string,
     competitor: {id: string, email: string, name: string},
     paid: boolean
+    competition_id: string
 }
 * */
 

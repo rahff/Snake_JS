@@ -1,4 +1,4 @@
-import {approve, query, reject} from "../common/common.js";
+import {ok, query, err} from "../common/common.js";
 
 
 
@@ -13,8 +13,8 @@ export const authentication_service = (get_competitor, password_matcher, jwt_ser
 
 const authenticate = (password_matcher, jwt_service, candidate_password) => async competitor => {
     const match_password = password_matcher(competitor.password, candidate_password);
-    if(match_password) return approve({token: jwt_service(competitor)});
+    if(match_password) return ok({token: jwt_service(competitor)});
     return bad_credentials();
 }
 
-const bad_credentials = () => reject({reason: "invalid credentials"})
+const bad_credentials = () => err({message: "invalid credentials"})
