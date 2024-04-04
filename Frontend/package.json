@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jasmine",
     "build:home": "rm ../Backend/public/js/home/main.js && bun build src/home/main.js > ../Backend/public/js/home/main.js"
   },
   "keywords": [],
