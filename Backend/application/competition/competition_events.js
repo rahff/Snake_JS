@@ -6,7 +6,7 @@ export const COMPETITOR_PARTICIPATED = "COMPETITOR_PARTICIPATED";
 export const COMPETITION_CREATED = "COMPETITION_CREATED";
 
 export const competition_eventBus = new EventEmitter()
-            .on(COMPETITION_CREATED, prize_module.create)
-            .on(COMPETITOR_PARTICIPATED, prize_module.increment_prize);
+.on(COMPETITION_CREATED, prize_module.create)
+.on(COMPETITOR_PARTICIPATED, prize_module.increment_prize);
 
 

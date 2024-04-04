@@ -1,10 +1,7 @@
 import {authentication_module} from "../../dependency_injection/authentication_module.js";
 import {Router} from "express";
-import {
-    log_in_controller,
-    register_competitor_controller
-} from "../../controller/authentication/authentication_controllers.js";
-
+import {register_competitor_controller} from "../../controller/authentication/register_controller.js";
+import {log_in_controller} from "../../controller/authentication/log_in_controller.js"
 
 
 export const authentication_router = Router();

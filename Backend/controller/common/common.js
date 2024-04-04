@@ -21,7 +21,6 @@ export const ok_status_result = res => result => {
 }
 
 export const internal_server_exception = res => error => {
-    console.log("err ", error)
     res.status(500).json(error);
 }
 

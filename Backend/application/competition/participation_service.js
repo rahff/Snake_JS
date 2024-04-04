@@ -1,5 +1,5 @@
 import {doing, err, ok, query} from "../common/common.js";
-import {paid_participation, unpaid_participation} from "./model.js";
+import {paid_participation, unpaid_participation} from "./model/Participation.js";
 
 
 
@@ -16,6 +16,7 @@ const create_participation = (save_participation, competitor) => async checkout_
     await save_participation(unpaid_participation(competitor, checkout_session));
     return ok({checkout_url: checkout_session.payment_url});
 }
+
 
 export const formalize_participation = (save_participation, get_participation) => {
     return async payment_confirmation => {

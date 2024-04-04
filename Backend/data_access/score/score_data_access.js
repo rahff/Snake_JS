@@ -2,6 +2,6 @@ export const in_memory_save_score = db => score => {
     db.push(score);
 }
 
-export const in_memory_get_snapshot = data => (competition_id, competitor_id) => data;
+export const in_memory_get_snapshot = db => (competition_id, competitor_id) => db;
 
-export const in_memory_save_snapshot = data => snapshot => data.push(snapshot);
+export const in_memory_save_snapshot = db => snapshot => db.push(snapshot);

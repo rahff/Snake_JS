@@ -1,8 +1,14 @@
 export const ok = data => ({is_ok: true, data});
 export const err = error => ({is_ok: false, error});
 
+export const an_error = message => ({message});
 
 export const doing = (fn, ...args) => {
+    const result = fn(...args);
+    return { is_ok_do: ok_fn(result) };
+}
+
+export const create = (fn, ...args) => {
     const result = fn(...args);
     return { is_ok_do: ok_fn(result) };
 }
@@ -39,9 +45,9 @@ export const unwrap_fn = result => () => {
     return result;
 }
 
-const not_exist_fn = data => async fn => {
+const not_exist_fn = flag => async fn => {
     let result;
-    if(!data) result = await fn(data);
+    if(!flag) result = await fn(flag);
     return {
         or_else_do: null_fn(result)
     }
@@ -62,6 +68,6 @@ export const else_fn = result => fn => {
 }
 
 const null_fn = result => fn => {
-    if (!result) return fn();
+    if (!result?.is_ok) return fn();
     else return result;
 }

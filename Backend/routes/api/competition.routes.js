@@ -1,6 +1,6 @@
 import {Router} from "express";
 import {competition_module} from "../../dependency_injection/competition_module.js";
-import {organize_competition_controller} from "../../controller/competition/competition_controller.js";
+import {organize_competition_controller} from "../../controller/competition/organize_competition_controller.js";
 
 
 

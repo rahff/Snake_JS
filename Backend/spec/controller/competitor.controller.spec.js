@@ -1,4 +1,4 @@
-import {participation_controller} from "../../controller/competitor/competitor_controllers.js";
+import {participation_checkout_controller} from "../../controller/competitor/participation_checkout_controller.js";
 import {participation_module} from "../../dependency_injection/participation_module.js";
 import {MockRequest, MockResponse} from "./utils/mocks.js";
 import {competition_db} from "../../data_access/competition/in_memory_data.js";
@@ -10,7 +10,7 @@ describe('Competitors endpoint Api', () => {
     let participation_checkout;
 
     beforeEach(() => {
-        participation_checkout = participation_controller(participation_module.checkout_service);
+        participation_checkout = participation_checkout_controller(participation_module.checkout_service);
     })
 
     it("POST on  /api/competitors/participate/:competition_id", async () => {

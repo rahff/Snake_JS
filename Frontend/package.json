@@ -1,0 +1,17 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jasmine",
+    "build": "rm ../Backend/public/js/main.js && bun build ./src/main.js > ../Backend/public/js/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^5.1.0"
+  }
+}

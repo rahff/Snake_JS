@@ -1,10 +1,10 @@
 
 import {fake_date_provider} from "../../services/date_time.js";
-import {organize_competition_controller} from "../../controller/competition/competition_controller.js";
+import {organize_competition_controller} from "../../controller/competition/organize_competition_controller.js";
 import {competition_module} from "../../dependency_injection/competition_module.js";
 import {MockRequest, MockResponse} from "./utils/mocks.js";
 import {competition_db} from "../../data_access/competition/in_memory_data.js";
-import {one_euro_prize} from "../../application/competition/model.js";
+import {one_euro_prize} from "../../application/competition/model/Prize.js";
 
 
 /*

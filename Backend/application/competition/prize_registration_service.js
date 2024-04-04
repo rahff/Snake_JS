@@ -1,5 +1,5 @@
 import {err, ok, query} from "../common/common.js";
-import {increment_prize, one_euro_prize} from "./model.js";
+import {increment_prize, one_euro_prize} from "./model/Prize.js";
 
 
 

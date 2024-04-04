@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "jasmine",
-    "start": "rm ../Backend/public/js/bundle.js && bun build ./src/index.js > ../Backend/public/js/bundle.js"
+    "start": "rm ../Backend/public/js/snake.js && bun build ./src/index.js > ../Backend/public/js/snake.js"
   },
   "keywords": [],
   "author": "",
