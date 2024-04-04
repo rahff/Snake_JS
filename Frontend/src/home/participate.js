@@ -1,6 +1,3 @@
-
-
-
 export const participate = fetch => async (competition_id, url) => {
     await fetch(url+"/"+competition_id, {method: "POST"});
 }

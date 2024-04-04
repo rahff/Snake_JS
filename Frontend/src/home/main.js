@@ -1,4 +1,4 @@
-import {participate_action, participate} from "./home.js";
+import {participate_action, participate} from "./participate.js";
 
 
 const init_page_reactivity = (fetch, dom_api) => _ => {
