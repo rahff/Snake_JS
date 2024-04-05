@@ -11,5 +11,5 @@ index_router.get("/home", (req, res) => {
 })
 
 index_router.get("/login", (req, res) => {
-    return res.render("components/login_form");
+    return res.render("partials/login_form");
 })
