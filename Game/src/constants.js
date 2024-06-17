@@ -31,7 +31,6 @@ export const ARROW_LEFT_KEY = "ArrowLeft";
 export const ARROW_UP_KEY = "ArrowUp";
 export const ARROW_DOWN_KEY = "ArrowDown";
 export const ENTER_KEY = "Enter";
-export const ESCAPE_KEY = "Escape";
 
 export const BLOCK_SIZE = 30;
 export const BORDER_RIGHT_BLOCK = BORDER_RIGHT/BLOCK_SIZE +1

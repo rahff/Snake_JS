@@ -6,10 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "jasmine",
-    "start": "rm ../Backend/public/js/snake.js && bun build ./src/index.js > ../Backend/public/js/snake.js"
+    "build": "bun build ./src/index.js > ../Backend/public/bundle.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "rahff",
   "license": "ISC",
   "devDependencies": {
     "jasmine": "^5.1.0"
